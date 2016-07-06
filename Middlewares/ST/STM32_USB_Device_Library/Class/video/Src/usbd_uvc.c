@@ -282,7 +282,7 @@ __ALIGN_BEGIN struct usbd_uvc_cfg USBD_UVC_CfgFSDesc __ALIGN_END =
       SIZEOF_M(struct usbd_uvc_cfg, uvc_vc_xu_lep_sys) +
       SIZEOF_M(struct usbd_uvc_cfg, uvc_vc_xu_lep_vid) +
       SIZEOF_M(struct usbd_uvc_cfg, uvc_vc_output_terminal), // header+units+terminals
-    .dwClockFrequency = 0x005B8D80,          // 6.000000 MHz
+    .dwClockFrequency = 8000000,          // 6.000000 MHz
     .bInCollection = 0x01,                   // 1 one streaming interface
     .baInterfaceNr = { 0x01 },               // 1 VS interface 1 belongs to this VC interface
   },
@@ -501,38 +501,38 @@ __ALIGN_BEGIN struct usbd_uvc_cfg USBD_UVC_CfgFSDesc __ALIGN_END =
   .uvc_vs_frames_formats = {
     {
       .uvc_vs_format = UVC_FORMAT_UNCOMPRESSED_DESCRIPTOR(YUYV, 1),
-      .uvc_vs_frame  = UVC_FRAME_FORMAT(1, YUYV, 80, 60),
+      .uvc_vs_frame  = UVC_FRAME_FORMAT(1, YUYV, SHEYNE_WIDTH, SHEYNE_HEIGHT),
       .uvc_vs_color  = UVC_COLOR_MATCHING_DESCRIPTOR(),
     },
     {
       .uvc_vs_format = UVC_FORMAT_UNCOMPRESSED_DESCRIPTOR(Y16, 1),
-      .uvc_vs_frame  = UVC_FRAME_FORMAT(1, Y16, 80, 60),
+      .uvc_vs_frame  = UVC_FRAME_FORMAT(1, Y16, SHEYNE_WIDTH, SHEYNE_HEIGHT),
       .uvc_vs_color  = UVC_COLOR_MATCHING_DESCRIPTOR(),
     },
     {
       .uvc_vs_format = UVC_FORMAT_UNCOMPRESSED_DESCRIPTOR(NV12, 1),
-      .uvc_vs_frame  = UVC_FRAME_FORMAT(1, NV12, 80, 60),
+      .uvc_vs_frame  = UVC_FRAME_FORMAT(1, NV12, SHEYNE_WIDTH, SHEYNE_HEIGHT),
       .uvc_vs_color  = UVC_COLOR_MATCHING_DESCRIPTOR(),
     },
     {
       .uvc_vs_format = UVC_FORMAT_UNCOMPRESSED_DESCRIPTOR(YU12, 1),
-      .uvc_vs_frame  = UVC_FRAME_FORMAT(1, YU12, 80, 60),
+      .uvc_vs_frame  = UVC_FRAME_FORMAT(1, YU12, SHEYNE_WIDTH, SHEYNE_HEIGHT),
       .uvc_vs_color  = UVC_COLOR_MATCHING_DESCRIPTOR(),
     },
     {
       .uvc_vs_format = UVC_FORMAT_UNCOMPRESSED_DESCRIPTOR(GREY, 1),
-      .uvc_vs_frame  = UVC_FRAME_FORMAT(1, GREY, 80, 60),
+      .uvc_vs_frame  = UVC_FRAME_FORMAT(1, GREY, SHEYNE_WIDTH, SHEYNE_HEIGHT),
       .uvc_vs_color  = UVC_COLOR_MATCHING_DESCRIPTOR(),
     },
 #ifndef Y16
     {
       .uvc_vs_format = UVC_FORMAT_UNCOMPRESSED_DESCRIPTOR(RGB565, 1),
-      .uvc_vs_frame  = UVC_FRAME_FORMAT(1, RGB565, 80, 60),
+      .uvc_vs_frame  = UVC_FRAME_FORMAT(1, RGB565, SHEYNE_WIDTH, SHEYNE_HEIGHT),
       .uvc_vs_color  = UVC_COLOR_MATCHING_DESCRIPTOR(),
     },
     {
       .uvc_vs_format = UVC_FORMAT_UNCOMPRESSED_DESCRIPTOR(BGR3, 1),
-      .uvc_vs_frame  = UVC_FRAME_FORMAT(1, BGR3, 80, 60),
+      .uvc_vs_frame  = UVC_FRAME_FORMAT(1, BGR3, SHEYNE_WIDTH, SHEYNE_HEIGHT),
       .uvc_vs_color  = UVC_COLOR_MATCHING_DESCRIPTOR(),
     },
 #endif
@@ -559,7 +559,7 @@ __ALIGN_BEGIN struct usbd_uvc_cfg USBD_UVC_CfgFSDesc __ALIGN_END =
     .bEndpointAddress = UVC_IN_EP,                // 0x83 EP 3 IN
     .bmAttributes = USBD_EP_TYPE_ISOC,            // 1 isochronous transfer type
     .wMaxPacketSize = VIDEO_PACKET_SIZE,
-    .bInterval = 0x01,                            // 1 one frame interval
+    .bInterval = 0x08,                            // 1 one frame interval
   },
 };
 

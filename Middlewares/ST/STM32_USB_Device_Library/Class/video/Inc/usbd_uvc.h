@@ -51,6 +51,10 @@
   * @{
   */ 
 
+#define SHEYNE_WIDTH 160
+#define SHEYNE_HEIGHT 120
+
+
 // USB Video device class specification version 1.10
 #ifdef UVC_1_1
 #define UVC_VERSION                             0x0110      // UVC 1.1
@@ -60,7 +64,7 @@
 
 #define UVC_IN_EP                                     0x81  /* EP1 for data IN */
 #define UVC_CMD_EP                                    0x82  /* EP2 for UVC commands */
-#define VIDEO_PACKET_SIZE                             ((unsigned int)(482))
+#define VIDEO_PACKET_SIZE                             ((unsigned int)(480 * 1 + 2))
 #define VIDEO_MAX_SETUP_PACKET_SIZE                   ((unsigned int)(1024))
 #define CMD_PACKET_SIZE                               ((unsigned int)(8))
 

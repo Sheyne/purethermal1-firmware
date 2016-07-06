@@ -146,13 +146,13 @@ PT_THREAD( lepton_task(struct pt *pt))
 
 			HAL_GPIO_TogglePin(SYSTEM_LED_GPIO_Port, SYSTEM_LED_Pin);
 
-#ifndef Y16
-			PT_SPAWN(
-				pt,
-				&rgb_to_yuv_pt,
-				rgb_to_yuv(&rgb_to_yuv_pt, completed_buffer, &yuv_buffers[(completed_yuv_frame_count + 1) % 2])
-			);
-#endif
+// #ifndef Y16
+// 			PT_SPAWN(
+// 				pt,
+// 				&rgb_to_yuv_pt,
+// 				rgb_to_yuv(&rgb_to_yuv_pt, completed_buffer, &yuv_buffers[(completed_yuv_frame_count + 1) % 2])
+// 			);
+// #endif
 		}
 	}
 	PT_END(pt);
