@@ -23,7 +23,7 @@
 
 extern SPI_HandleTypeDef hspi2;
 
-#define RING_SIZE (4)
+#define RING_SIZE (5)
 lepton_buffer lepton_buffers[RING_SIZE];
 static uint32_t current_buffer_index = 0;
 static lepton_xfer_state xfer_state = LEPTON_XFER_STATE_START;
@@ -33,9 +33,13 @@ static inline HAL_StatusTypeDef start_lepton_spi_dma(DMA_HandleTypeDef *hdma, ui
 static inline HAL_StatusTypeDef setup_lepton_spi_rx(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size);
 static void lepton_spi_rx_dma_cplt(DMA_HandleTypeDef *hdma);
 
+void increment_buffer_index(){
+   	current_buffer_index = ((current_buffer_index + 1) % RING_SIZE);
+}
+
 lepton_buffer* get_next_lepton_buffer()
 {
-  current_buffer_index = ((current_buffer_index + 1) % RING_SIZE);
+//  current_buffer_index = ((current_buffer_index + 1) % RING_SIZE);
   lepton_buffer* packet = &lepton_buffers[current_buffer_index];
   packet->status = LEPTON_STATUS_OK;
   return packet;
@@ -125,6 +129,7 @@ static void lepton_spi_rx_dma_cplt(DMA_HandleTypeDef *hdma)
     xfer_state = LEPTON_XFER_STATE_START;
 
     buffer->status = ((frame == (IMAGE_NUM_LINES - 1)) ? LEPTON_STATUS_OK : LEPTON_STATUS_RESYNC);
+
     break;
   }
 }

@@ -19,15 +19,9 @@
 extern volatile uint8_t uvc_stream_status;
 extern struct uvc_streaming_control videoCommitControl;
 
-static int overlay_mode = 0;
-
-void change_overlay_mode(void)
-{
-    overlay_mode = (overlay_mode+1) % 2;
-}
 
 static int last_frame_count;
-static lepton_buffer *last_buffer;
+static y8_full_buffer *last_buffer;
 
 #ifdef USART_DEBUG
 #define DEBUG_PRINTF(...) printf( __VA_ARGS__);
@@ -97,43 +91,17 @@ PT_THREAD( usb_task(struct pt *pt))
         case VS_FMT_INDEX(YUYV): {
             while (uvc_xmit_row < SHEYNE_HEIGHT && count + SHEYNE_WIDTH * 2 <= VIDEO_PACKET_SIZE) {
             	int width = SHEYNE_WIDTH;
-            	if (uvc_xmit_row * 2 < SHEYNE_HEIGHT){
-            		width = SHEYNE_WIDTH / 2;
 
-            		// endian flip
-            	    uint16_t* lineptr = (uint16_t*)last_buffer->lines[IMAGE_OFFSET_LINES + uvc_xmit_row].data.image_data;
-            	    while (lineptr < (uint16_t*)&last_buffer->lines[IMAGE_OFFSET_LINES + uvc_xmit_row].data.image_data[FRAME_LINE_LENGTH])
-            	    {
-            	      uint8_t* bytes = (uint8_t*)lineptr;
-            	      *lineptr++ = bytes[0] << 8 | bytes[1];
-            	    }
+            	int segment_index = uvc_xmit_row / (SHEYNE_HEIGHT / 4);
+            	int segment_row = uvc_xmit_row - segment_index * (SHEYNE_HEIGHT / 4);
 
-            	    // can't afford the buffers to do this in it's own task
-                    for (i = 0; i < SHEYNE_WIDTH / 2; i++) {
-                        rgb_t val = last_buffer->lines[IMAGE_OFFSET_LINES + uvc_xmit_row].data.image_data[i];
-                        float r = val.r, g = val.g, b = val.b;
-                        float y1 = 0.299f * r + 0.587f * g + 0.114f * b;
-
-                        if ((i % 2) == 0)
-                        	packet[count++] = clamp (0.496f * (b - y1) + 128.0f);
-                        else
-                        	packet[count++] = clamp (0.627f * (r - y1) + 128.0f);
-
-                        packet[count++] = clamp (0.859f *      y1  +  16.0f);
-                    }
-//            		  memcpy(&packet[count], last_buffer->data[uvc_xmit_row], sizeof(yuv422_row_t));
-//            		  count += sizeof(yuv422_row_t);
+            	for(int i = 0; i < SHEYNE_WIDTH; i++){
+                	uint8_t grey = last_buffer->segments[segment_index][segment_row][i];
+                	packet[count++] = 127;
+                	packet[count++] = grey;
             	}
 
-                for (int x = 0; x < width; x++) {
-                    unsigned char chroma_square = x % 2 ? 120 : 0;
-                    unsigned char chroma_background = x % 2 ? 0 : 120;
-
-                    packet[count++] = x > (frame_number) && x < (frame_number + 10) && uvc_xmit_row > (frame_number) && uvc_xmit_row <  (frame_number + 10) ? chroma_square : chroma_background;
-                    packet[count++] = 120;
-                }
-
-                uvc_xmit_row++;
+            	uvc_xmit_row++;
             }
             // image is done
             if (uvc_xmit_row == SHEYNE_HEIGHT) {

@@ -48,7 +48,6 @@ PT_THREAD( button_task(struct pt *pt))
 
 			PT_YIELD(pt);
 		}
-		change_overlay_mode();
 	}
 	PT_END(pt);
 }

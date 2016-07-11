@@ -213,6 +213,11 @@ HAL_StatusTypeDef enable_telemetry(void)
   return HAL_OK;
 }
 
+HAL_StatusTypeDef set_user_lut(LEP_VID_LUT_BUFFER_T_PTR user_lut)
+{
+  return LEP_SetVidUserLut(&hport_desc, user_lut);
+}
+
 HAL_StatusTypeDef enable_rgb888(LEP_PCOLOR_LUT_E pcolor_lut)
 {
   LEP_RESULT result;

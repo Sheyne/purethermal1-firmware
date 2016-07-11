@@ -87,6 +87,10 @@ typedef struct __attribute__((packed)) _telemetry_data_l3 {
 
 } telemetry_data_l3;
 
+typedef struct __attribute__((packed)) _y8_full_buffer{
+	uint8_t segments[4][30][160];
+} y8_full_buffer;
+
 typedef struct __attribute__((packed)) _rgb {
   uint8_t r;
   uint8_t g;
@@ -122,14 +126,9 @@ typedef struct __attribute__((packed)) _yuv422 {
   uint8_t y;
 } yuv422_t;
 
-typedef yuv422_t yuv422_row_t[FRAME_LINE_LENGTH];
-
-typedef struct __attribute__((packed)) _yuv422_buffer {
-  yuv422_row_t data[IMAGE_NUM_LINES];
-} yuv422_buffer_t;
-
 lepton_status complete_lepton_transfer(lepton_buffer *);
 lepton_buffer* lepton_transfer(void);
+void increment_buffer_index();
 
 void print_image_binary_background(void);
 void lepton_init(void );
