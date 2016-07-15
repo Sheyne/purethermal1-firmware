@@ -103,6 +103,10 @@ PT_THREAD( lepton_task(struct pt *pt))
 
 		if (complete_lepton_transfer(current_buffer) != LEPTON_STATUS_OK)
 		{
+			if (current_buffer->status == LEPTON_STATUS_RESYNC)
+			{
+				HAL_Delay(250);
+			}
 			continue;
 		}
 
