@@ -23,11 +23,6 @@ int segment_index_ready = -1, segment_index_copied = -1;
 
 lepton_buffer *filling_segments[4];
 
-#define RING_SIZE_TESTING 20
-
-int testing_insert_index = 0;
-int sheyne_is_testing_things[RING_SIZE_TESTING] = {0};
-
 uint32_t completed_frame_count = 0;
 
 uint8_t lepton_i2c_buffer[36];
@@ -115,12 +110,6 @@ PT_THREAD( lepton_task(struct pt *pt))
 		int segment_index = segment_number - 1; // number = 0, index = -1 indicates that this is a repeat
 		// (and thus discardable) segment
 
-		sheyne_is_testing_things[testing_insert_index] = segment_index;
-		testing_insert_index = (testing_insert_index + 1) % RING_SIZE_TESTING;
-
-		if (testing_insert_index == 0){
-//			HAL_GPIO_TogglePin(SYSTEM_LED_GPIO_Port, SYSTEM_LED_Pin);
-		}
 		if (segment_index_ready + 1 == segment_index){
 			segment_index_ready = segment_index;
 
