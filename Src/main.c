@@ -158,6 +158,8 @@ int main(void)
   enable_lepton_agc();
 #endif
 
+  enable_radiometry();
+
 #ifdef Y16
   enable_telemetry();
 #else

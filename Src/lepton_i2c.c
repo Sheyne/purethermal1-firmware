@@ -8,6 +8,7 @@
 #include "LEPTON_SDK.h"
 #include "LEPTON_SYS.h"
 #include "LEPTON_AGC.h"
+#include "LEPTON_RAD.h"
 #include "LEPTON_VID.h"
 #include "LEPTON_OEM.h"
 
@@ -213,6 +214,10 @@ HAL_StatusTypeDef enable_telemetry(void)
   return HAL_OK;
 }
 
+void enable_radiometry(){
+	// todo better error handling
+  LEP_SetRadEnableState(&hport_desc, LEP_RAD_ENABLE);
+}
 HAL_StatusTypeDef enable_rgb888(LEP_PCOLOR_LUT_E pcolor_lut)
 {
   LEP_RESULT result;

@@ -162,6 +162,8 @@ static void get_min_max(lepton_buffer *buffer, uint16_t * min, uint16_t * max)
 static void get_min_max(yuv422_buffer_t *buffer, uint16_t * min, uint16_t * max)
 #endif
 {
+//	*min = 3000;
+//	*max = 4200;
 	int i,j;
 	*min= 0xffff;
 	*max= 0;
@@ -185,6 +187,15 @@ static void get_min_max(yuv422_buffer_t *buffer, uint16_t * min, uint16_t * max)
 			}
 		}
 	}
+	// bad bad bad, once radiometry actually works we can use the hardcoded min max above
+	*max = *min + 1500;
+}
+
+static inline uint8_t clamp (float x)
+{
+  if (x < 0)         return 0;
+  else if (x > 255)  return 255;
+  else               return (uint8_t)x;
 }
 
 #ifdef Y16
@@ -201,8 +212,8 @@ static void scale_image_8bit(yuv422_buffer_t *buffer, uint16_t min, uint16_t max
 		{
 #ifdef Y16
 			uint16_t val = buffer->lines[j].data.image_data[i];
-			val -= min;
-			val = (( val * 255) / (max-min));
+			val = clamp(val - min);
+			val = clamp((( val * 255) / (max-min)));
 
 			buffer->lines[j].data.image_data[i] = val;
 #else
@@ -462,8 +473,8 @@ PT_THREAD( usb_task(struct pt *pt))
             {
               uint16_t val = last_buffer->lines[IMAGE_OFFSET_LINES + uvc_xmit_row].data.image_data[i];
               // AGC is on so just use lower 8 bits
-              packet[count++] = (uint8_t)val;
               packet[count++] = 128;
+              packet[count++] = (uint8_t)val;
             }
 
             uvc_xmit_row++;
