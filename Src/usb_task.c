@@ -154,42 +154,7 @@ static void draw_splash(int min, int max)
 	//UG_PutChar('0',x_loc,y_loc,max,min);
 
 }
-
 #ifndef ENABLE_LEPTON_AGC
-#ifdef Y16
-static void get_min_max(lepton_buffer *buffer, uint16_t * min, uint16_t * max)
-#else
-static void get_min_max(yuv422_buffer_t *buffer, uint16_t * min, uint16_t * max)
-#endif
-{
-//	*min = 3000;
-//	*max = 4200;
-	int i,j;
-	*min= 0xffff;
-	*max= 0;
-	for (j = 0; j < IMAGE_NUM_LINES; j++)
-	{
-		for (i = 0; i < FRAME_LINE_LENGTH; i++)
-		{
-#ifdef Y16
-			uint16_t val = buffer->lines[j].data.image_data[i];
-#else
-			uint8_t val = buffer->data[j][i].y;
-#endif
-
-			if( val > *max )
-			{
-				*max = val;
-			}
-			if( val < *min)
-			{
-				*min = val;
-			}
-		}
-	}
-	// bad bad bad, once radiometry actually works we can use the hardcoded min max above
-	*max = *min + 1500;
-}
 
 static inline uint8_t clamp (float x)
 {
@@ -198,11 +163,7 @@ static inline uint8_t clamp (float x)
   else               return (uint8_t)x;
 }
 
-#ifdef Y16
-static void scale_image_8bit(lepton_buffer *buffer, uint16_t min, uint16_t max)
-#else
-static void scale_image_8bit(yuv422_buffer_t *buffer, uint16_t min, uint16_t max)
-#endif
+static void scale_image_8bit(lepton_buffer *buffer)
 {
 	int i,j;
 
@@ -210,19 +171,9 @@ static void scale_image_8bit(yuv422_buffer_t *buffer, uint16_t min, uint16_t max
 	{
 		for (i = 0; i < FRAME_LINE_LENGTH; i++)
 		{
-#ifdef Y16
-			uint16_t val = buffer->lines[j].data.image_data[i];
-			val = clamp(val - min);
-			val = clamp((( val * 255) / (max-min)));
-
-			buffer->lines[j].data.image_data[i] = val;
-#else
-			uint8_t val = buffer->data[j][i].y;
-			val -= min;
-			val = (( val * 255) / (max-min));
-
-			buffer->data[j][i].y = val;
-#endif
+			int32_t val = buffer->lines[j].data.image_data[i];
+			val = (val - 1890) / 8.95;
+			buffer->lines[j].data.image_data[i] = (uint16_t)clamp(val);
 		}
 	}
 }
@@ -232,9 +183,6 @@ PT_THREAD( usb_task(struct pt *pt))
 {
 	static int temperature;
 	static uint16_t count = 0, i;
-#ifndef ENABLE_LEPTON_AGC
-	static uint16_t current_min, current_max;
-#endif
 
 	static uint8_t uvc_header[2] = { 2, 0 };
 	static uint32_t uvc_xmit_row = 0, uvc_xmit_plane = 0;
@@ -266,8 +214,7 @@ PT_THREAD( usb_task(struct pt *pt))
 			break;
 		default:
 			// do our hoky linear agc for 8-bit types
-			get_min_max(last_buffer, &current_min, &current_max);
-			scale_image_8bit(last_buffer, current_min, current_max);
+			scale_image_8bit(last_buffer);
 			break;
 		}
 #endif
