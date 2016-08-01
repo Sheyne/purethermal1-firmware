@@ -63,12 +63,29 @@
 #include "usbd_desc.h"
 #include "usbd_ctlreq.h"
 #include "usbd_types.h"
+#include "lepton_UVC_index_convert.h"
 
 #ifdef USART_DEBUG
 #define DEBUG_PRINTF(...) printf( __VA_ARGS__);
 #else
 #define DEBUG_PRINTF(...)
 #endif
+
+#define LEP_COMMANDS_AGC_COUNT (19)
+#define LEP_COMMANDS_AGC_BITFIELD 0xff, 0xff, 0x7
+#define LEP_COMMANDS_AGC_BITFIELD_LEN 3
+#define LEP_COMMANDS_OEM_COUNT (36)
+#define LEP_COMMANDS_OEM_BITFIELD 0xff, 0xff, 0xff, 0xff, 0xf
+#define LEP_COMMANDS_OEM_BITFIELD_LEN 5
+#define LEP_COMMANDS_RAD_COUNT (52)
+#define LEP_COMMANDS_RAD_BITFIELD 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xf
+#define LEP_COMMANDS_RAD_BITFIELD_LEN 7
+#define LEP_COMMANDS_SYS_COUNT (19)
+#define LEP_COMMANDS_SYS_BITFIELD 0xff, 0xff, 0x7
+#define LEP_COMMANDS_SYS_BITFIELD_LEN 3
+#define LEP_COMMANDS_VID_COUNT (9)
+#define LEP_COMMANDS_VID_BITFIELD 0xff, 0x1
+#define LEP_COMMANDS_VID_BITFIELD_LEN 2
 
 // #define UVC_SETUP_REQ_DEBUG
 
@@ -185,8 +202,6 @@ USBD_ClassTypeDef  USBD_UVC =
 
 DECLARE_UVC_HEADER_DESCRIPTOR(1);
 DECLARE_UVC_FRAME_UNCOMPRESSED(1);
-DECLARE_UVC_EXTENSION_UNIT_DESCRIPTOR(1, 4);
-DECLARE_UVC_EXTENSION_UNIT_DESCRIPTOR(1, 8);
 DECLARE_UVC_INPUT_HEADER_DESCRIPTOR(1, VS_NUM_FORMATS);
 
 struct uvc_vs_frame_format_desc {
@@ -203,11 +218,11 @@ struct usbd_uvc_cfg {
   struct UVC_HEADER_DESCRIPTOR(1) ucv_vc_header;
   struct uvc_camera_terminal_descriptor uvc_vc_input_terminal;
   struct uvc_processing_unit_descriptor uvc_vc_processing_unit;
-  struct UVC_EXTENSION_UNIT_DESCRIPTOR(1, 4) uvc_vc_xu_lep_agc;
-  struct UVC_EXTENSION_UNIT_DESCRIPTOR(1, 4) uvc_vc_xu_lep_oem;
-  struct UVC_EXTENSION_UNIT_DESCRIPTOR(1, 8) uvc_vc_xu_lep_rad;
-  struct UVC_EXTENSION_UNIT_DESCRIPTOR(1, 4) uvc_vc_xu_lep_sys;
-  struct UVC_EXTENSION_UNIT_DESCRIPTOR(1, 4) uvc_vc_xu_lep_vid;
+  struct UVC_EXTENSION_UNIT_DESCRIPTOR(LEP_COMMANDS_AGC_BITFIELD_LEN) uvc_vc_xu_lep_agc;
+  struct UVC_EXTENSION_UNIT_DESCRIPTOR(LEP_COMMANDS_OEM_BITFIELD_LEN) uvc_vc_xu_lep_oem;
+  struct UVC_EXTENSION_UNIT_DESCRIPTOR(LEP_COMMANDS_RAD_BITFIELD_LEN) uvc_vc_xu_lep_rad;
+  struct UVC_EXTENSION_UNIT_DESCRIPTOR(LEP_COMMANDS_SYS_BITFIELD_LEN) uvc_vc_xu_lep_sys;
+  struct UVC_EXTENSION_UNIT_DESCRIPTOR(LEP_COMMANDS_VID_BITFIELD_LEN) uvc_vc_xu_lep_vid;
   struct uvc_output_terminal_descriptor uvc_vc_output_terminal;
   struct usb_endpoint_descriptor uvc_vc_ep;
   struct uvc_control_endpoint_descriptor uvc_vc_cs_ep;
@@ -331,12 +346,12 @@ __ALIGN_BEGIN struct usbd_uvc_cfg USBD_UVC_CfgFSDesc __ALIGN_END =
       'a','g','c','-',
       '0','0','0','0'
     },
-    .bNumControls = 0x13,                        // Number of controls in this terminal
-    .bNrInPins = 0x01,                           // Number of input pins in this terminal
-    .baSourceID = { 0x02 },                      // Source ID : 2 : Connected to Proc Unit
-    .bControlSize = 0x04,                        // Size of controls field for this terminal : 1 byte
-    .bmControls = { 0xff, 0xff, 0x07, 0x00 },    // Registers 0x00 to 0x48
-    .iExtension = 0x00,                          // String desc index : Not used
+    .bNumControls = LEP_COMMANDS_AGC_COUNT,
+    .bNrInPins = 0x01,
+    .baSourceID = { 0x02 },
+    .bControlSize = LEP_COMMANDS_AGC_BITFIELD_LEN,
+    .bmControls = { LEP_COMMANDS_AGC_BITFIELD },
+    .iExtension = 0x00,
   },
 
   /* Extension Unit Descriptor */
@@ -352,12 +367,12 @@ __ALIGN_BEGIN struct usbd_uvc_cfg USBD_UVC_CfgFSDesc __ALIGN_END =
       'o','e','m','-',
       '0','0','0','0'
     },
-    .bNumControls = 0x1e,                        // Number of controls in this terminal
-    .bNrInPins = 0x01,                           // Number of input pins in this terminal
-    .baSourceID = { 0x02 },                      // Source ID : 2 : Connected to Proc Unit
-    .bControlSize = 0x04,                        // Size of controls field for this terminal : 1 byte
-    .bmControls = { 0xbf, 0xff, 0xff, 0x7f },    // Registers 0x00 to 0x48
-    .iExtension = 0x00,                          // String desc index : Not used
+    .bNumControls = LEP_COMMANDS_OEM_COUNT,
+    .bNrInPins = 0x01,
+    .baSourceID = { 0x02 },
+    .bControlSize = LEP_COMMANDS_OEM_BITFIELD_LEN,
+    .bmControls = { LEP_COMMANDS_OEM_BITFIELD },
+    .iExtension = 0x00,
   },
 
   /* Extension Unit Descriptor */
@@ -373,12 +388,12 @@ __ALIGN_BEGIN struct usbd_uvc_cfg USBD_UVC_CfgFSDesc __ALIGN_END =
       'r','a','d','-',
       '0','0','0','0'
     },
-    .bNumControls = 47,                          // Number of controls in this terminal
-    .bNrInPins = 0x01,                           // Number of input pins in this terminal
-    .baSourceID = { 0x02 },                      // Source ID : 2 : Connected to Proc Unit
-    .bControlSize = 0x08,                        // Size of controls field for this terminal : 1 byte
-    .bmControls = { 0xFF, 0xFF, 0xFF, 0x81, 0xFC, 0xCF, 0xFF, 0x01 },    // Registers 0x00 to 0x48
-    .iExtension = 0x00,                          // String desc index : Not used
+    .bNumControls = LEP_COMMANDS_RAD_COUNT,
+    .bNrInPins = 0x01,
+    .baSourceID = { 0x02 },
+    .bControlSize = LEP_COMMANDS_RAD_BITFIELD_LEN,
+    .bmControls = { LEP_COMMANDS_RAD_BITFIELD },
+    .iExtension = 0x00,
   },
 
   /* Extension Unit Descriptor */
@@ -394,12 +409,12 @@ __ALIGN_BEGIN struct usbd_uvc_cfg USBD_UVC_CfgFSDesc __ALIGN_END =
       's','y','s','-',
       '0','0','0','0'
     },
-    .bNumControls = 0x12,                        // Number of controls in this terminal
-    .bNrInPins = 0x01,                           // Number of input pins in this terminal
-    .baSourceID = { 0x02 },                      // Source ID : 2 : Connected to Proc Unit
-    .bControlSize = 0x04,                        // Size of controls field for this terminal : 1 byte
-    .bmControls = { 0xFF, 0xFF, 0x03, 0x00 },    // Registers 0x00 to 0x48
-    .iExtension = 0x00,                          // String desc index : Not used
+    .bNumControls = LEP_COMMANDS_SYS_COUNT,
+    .bNrInPins = 0x01,
+    .baSourceID = { 0x02 },
+    .bControlSize = LEP_COMMANDS_SYS_BITFIELD_LEN,
+    .bmControls = { LEP_COMMANDS_SYS_BITFIELD },
+    .iExtension = 0x00,
   },
 
   /* Extension Unit Descriptor */
@@ -415,12 +430,12 @@ __ALIGN_BEGIN struct usbd_uvc_cfg USBD_UVC_CfgFSDesc __ALIGN_END =
       'v','i','d','-',
       '0','0','0','0'
     },
-    .bNumControls = 0x0a,                        // Number of controls in this terminal
-    .bNrInPins = 0x01,                           // Number of input pins in this terminal
-    .baSourceID = { 0x02 },                      // Source ID : 2 : Connected to Proc Unit
-    .bControlSize = 0x04,                        // Size of controls field for this terminal : 1 byte
-    .bmControls = { 0xFF, 0x03, 0x00, 0x00 },    // Registers 0x00 to 0x48
-    .iExtension = 0x00,                          // String desc index : Not used
+    .bNumControls = LEP_COMMANDS_VID_COUNT,
+    .bNrInPins = 0x01,
+    .baSourceID = { 0x02 },
+    .bControlSize = LEP_COMMANDS_VID_BITFIELD_LEN,
+    .bmControls = { LEP_COMMANDS_VID_BITFIELD },
+    .iExtension = 0x00,
   },
 
   /* Output Terminal Descriptor */

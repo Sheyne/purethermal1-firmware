@@ -33,6 +33,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_uvc_if.h"
 #include "usbd_uvc_lepton_xu.h"
+#include "lepton_UVC_index_convert.h"
+#include "LEPTON_ErrorCodes.h"
 
 #ifdef USART_DEBUG
 #define DEBUG_PRINTF(...) printf( __VA_ARGS__);
@@ -242,6 +244,10 @@ static int8_t UVC_VC_ControlGet  (VC_TERMINAL_ID entity_id, uint8_t cmd, uint8_t
 { 
   /* USER CODE BEGIN 5 */
   uint8_t cs_value = (value >> 8) & 0xFF;
+  struct Lepton_Command *command = cs_value_to_lepton_sdk(cs_value, entity_id);
+  if (command == &Lepton_Command_Invalid){
+	  return USBD_FAIL;
+  }
 
 #ifdef UVC_VC_DEBUG
   DEBUG_PRINTF("UVC_VC_ControlGet(entity_id=%d,cmd=%x,pbuf=%p,length=%x, index=%x,value=%x)\r\n", entity_id, cmd, pbuf, length, idx, value);
@@ -277,17 +283,17 @@ static int8_t UVC_VC_ControlGet  (VC_TERMINAL_ID entity_id, uint8_t cmd, uint8_t
     case UVC_GET_MIN:
       break;
     case UVC_GET_CUR:
-      if (length > 1)
-        VC_LEP_GetAttribute(entity_id, (cs_value - 1) << 2, pbuf, length);
+      return VC_LEP_GetAttribute(command, pbuf, length) == LEP_OK ? USBD_OK :USBD_FAIL;
       break;
     case UVC_GET_MAX:
-      VC_LEP_GetMaxValue(entity_id, (cs_value - 1) << 2, pbuf, length);
+      return VC_LEP_GetMaxValue(command, pbuf, length) == LEP_OK ? USBD_OK :USBD_FAIL;
       break;
     case UVC_GET_RES:
       pbuf[0] = 1;
       break;
     case UVC_GET_LEN:
-      VC_LEP_GetAttributeLen(entity_id, (cs_value - 1) << 2, (uint16_t*)pbuf);
+      pbuf[0] = 0xFF & (command->attributeWordLength << 1);
+      pbuf[1] = 0xFF & ((command->attributeWordLength << 1) >> 8);
       break;
     case UVC_GET_INFO:
       pbuf[0] = UVC_CONTROL_CAP_GET | UVC_CONTROL_CAP_SET;
@@ -347,6 +353,9 @@ static int8_t UVC_VC_ControlSet  (VC_TERMINAL_ID entity_id, uint8_t cmd, uint8_t
 { 
   /* USER CODE BEGIN 5 */
   uint8_t cs_value = (value >> 8) & 0xFF;
+  struct Lepton_Command *command = cs_value_to_lepton_sdk(cs_value, entity_id);
+  if (command == &Lepton_Command_Invalid)
+	  return USBD_FAIL;
 
 #ifdef UVC_VC_DEBUG
   DEBUG_PRINTF("UVC_VC_ControlSet(entity_id=%d, cmd=%x,pbuf=%p,length=%x,index=%x,value=%x)\r\n", entity_id, cmd, pbuf, length, idx, value);
@@ -375,10 +384,7 @@ static int8_t UVC_VC_ControlSet  (VC_TERMINAL_ID entity_id, uint8_t cmd, uint8_t
   case VC_CONTROL_XU_LEP_RAD_ID:
   case VC_CONTROL_XU_LEP_SYS_ID:
   case VC_CONTROL_XU_LEP_VID_ID:
-    if (length == 1)
-      VC_LEP_RunCommand(entity_id, (cs_value - 1) << 2);
-    else
-      VC_LEP_SetAttribute(entity_id, (cs_value - 1) << 2, pbuf, length);
+    return VC_LEP_SetAttribute(command, pbuf, length) == LEP_OK ? USBD_OK :USBD_FAIL;
     break;
   case VC_CONTROL_PU_ID:
     break;

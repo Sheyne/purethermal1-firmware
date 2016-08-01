@@ -321,11 +321,7 @@ struct uvc_extension_unit_descriptor {
 
 #define UVC_DT_EXTENSION_UNIT_SIZE(p, n)		(24+(p)+(n))
 
-#define UVC_EXTENSION_UNIT_DESCRIPTOR(p, n) \
-	uvc_extension_unit_descriptor_##p_##n
-
-#define DECLARE_UVC_EXTENSION_UNIT_DESCRIPTOR(p, n)	\
-struct UVC_EXTENSION_UNIT_DESCRIPTOR(p, n) {		\
+#define UVC_EXTENSION_UNIT_DESCRIPTOR(n) {		\
 	uint8_t  bLength;					\
 	uint8_t  bDescriptorType;				\
 	uint8_t  bDescriptorSubType;			\
@@ -333,7 +329,7 @@ struct UVC_EXTENSION_UNIT_DESCRIPTOR(p, n) {		\
 	uint8_t  guidExtensionCode[16];			\
 	uint8_t  bNumControls;				\
 	uint8_t  bNrInPins;				\
-	uint8_t  baSourceID[p];				\
+	uint8_t  baSourceID[1];				\
 	uint8_t  bControlSize;				\
 	uint8_t  bmControls[n];				\
 	uint8_t  iExtension;				\
