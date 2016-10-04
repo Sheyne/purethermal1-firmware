@@ -80,6 +80,8 @@ PT_THREAD( lepton_task(struct pt *pt))
 	static uint32_t last_logged_count = 0;
 	static uint32_t current_frame_count = 0;
 	static lepton_buffer *current_buffer;
+	static struct pt rgb_to_yuv_pt;
+	static int transferring_timer = 0;
 	curtick = last_tick = HAL_GetTick();
 
 	while (1)
@@ -88,10 +90,14 @@ PT_THREAD( lepton_task(struct pt *pt))
 		set_current_lepton_buffer(current_buffer);
 		lepton_transfer();
 
-		PT_YIELD_UNTIL(pt, current_buffer->status != LEPTON_STATUS_TRANSFERRING);
+		transferring_timer = HAL_GetTick();
+		PT_YIELD_UNTIL(pt, current_buffer->status != LEPTON_STATUS_TRANSFERRING || ((HAL_GetTick() - transferring_timer) > 200));
 
 		if (complete_lepton_transfer(current_buffer) != LEPTON_STATUS_OK)
 		{
+			if (current_buffer->status == LEPTON_STATUS_TRANSFERRING){
+				current_buffer->status = LEPTON_STATUS_RESYNC;
+			}
 			if (current_buffer->status == LEPTON_STATUS_RESYNC)
 			{
 				if (current_frame_count != 0)
