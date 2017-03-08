@@ -1,4 +1,4 @@
-#if defined(USART_DEBUG) && !defined(GDB_SEMIHOSTING)
+#if !defined(GDB_SEMIHOSTING)
 /*
  * newlib_stubs.c
  *
