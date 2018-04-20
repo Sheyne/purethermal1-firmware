@@ -29,6 +29,7 @@ struct uvc_vs_frames_formats_descriptor {
   struct UVC_FRAMES_FORMAT_UNCOMPRESSED(1) uvc_vs_frames_format_3;
   struct UVC_FRAMES_FORMAT_UNCOMPRESSED(1) uvc_vs_frames_format_4;
   struct UVC_FRAMES_FORMAT_UNCOMPRESSED(1) uvc_vs_frames_format_5;
+  struct UVC_FRAMES_FORMAT_UNCOMPRESSED(1) uvc_vs_frames_format_6;
 };
 
 struct usbd_uvc_cfg {

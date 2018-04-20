@@ -84,9 +84,10 @@ enum _vs_fmt_indexes {
   VS_FMT_INDEX_GREY,
   VS_FMT_INDEX_RGB565,
   VS_FMT_INDEX_BGR3,
+  VS_FMT_INDEX_RGB3,
 };
 
-#define VS_NUM_FORMATS 5
+#define VS_NUM_FORMATS 6
 
 enum _vs_fmt_size {
   VS_FMT_SIZE_YUYV = 16,
@@ -94,6 +95,7 @@ enum _vs_fmt_size {
   VS_FMT_SIZE_GREY =  8,
   VS_FMT_SIZE_RGB565 = 16,
   VS_FMT_SIZE_BGR3 = 24,
+  VS_FMT_SIZE_RGB3 = 24,
 };
 
 #define VS_FMT_GUID_NONE \
@@ -116,6 +118,10 @@ enum _vs_fmt_size {
 
 #define VS_FMT_GUID_BGR3 \
     0x7d, 0xeb, 0x36, 0xe4, 0x4f, 0x52, 0xce, 0x11, 0x9f, 0x53, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70
+
+#define VS_FMT_GUID_RGB3 \
+    'R',  'G',  'B',  '3', 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71
+
 
 #define VS_FMT_GUID_RGB565 \
     'R',  'G',  'B',  'P', 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71

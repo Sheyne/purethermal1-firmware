@@ -316,6 +316,22 @@ PT_THREAD( usb_task(struct pt *pt))
 
           break;
         }
+        case VS_FMT_INDEX(RGB3):
+        {
+          while (uvc_xmit_row < IMAGE_NUM_LINES && count < VIDEO_PACKET_SIZE)
+          {
+            for (i = 0; i < FRAME_LINE_LENGTH; i++)
+            {
+              rgb_t rgb = last_buffer->lines.rgb[IMAGE_OFFSET_LINES + uvc_xmit_row].data.image_data[i];
+              packet[count++] = rgb.r;
+              packet[count++] = rgb.g;
+              packet[count++] = rgb.b;
+            }
+            uvc_xmit_row++;
+          }
+
+          break;
+        }
         case VS_FMT_INDEX(RGB565):
         {
           while (uvc_xmit_row < IMAGE_NUM_LINES && count < VIDEO_PACKET_SIZE)

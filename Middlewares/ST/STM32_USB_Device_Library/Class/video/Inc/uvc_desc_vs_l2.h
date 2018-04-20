@@ -72,4 +72,10 @@
     .uvc_vs_frame  = { UVC_FRAME_FORMAT(VS_FRAME_INDEX_DEFAULT, BGR3, 80, 60) },
     .uvc_vs_color  = UVC_COLOR_MATCHING_DESCRIPTOR(),
   },
+.uvc_vs_frames_format_6 =
+  {
+    .uvc_vs_format = UVC_FORMAT_UNCOMPRESSED_DESCRIPTOR(RGB3, 1),
+    .uvc_vs_frame  = { UVC_FRAME_FORMAT(VS_FRAME_INDEX_DEFAULT, RGB3, 80, 60) },
+    .uvc_vs_color  = UVC_COLOR_MATCHING_DESCRIPTOR(),
+  },
 },

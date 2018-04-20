@@ -518,6 +518,9 @@ static int8_t UVC_VS_ControlGet  (uint8_t cmd, uint8_t* pbuf, uint16_t length, u
         case VS_FMT_INDEX(BGR3):
           frame = frames_formats->uvc_vs_frames_format_5.uvc_vs_frame;
           break;
+        case VS_FMT_INDEX(RGB3):
+          frame = frames_formats->uvc_vs_frames_format_6.uvc_vs_frame;
+          break;
         default:
           return USBD_FAIL;
         }
